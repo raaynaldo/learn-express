@@ -28,14 +28,9 @@ app.get('/api/courses/:id', (req, res) => {
 });
 
 app.post('/api/courses', (req, res) => {
-  const schema = Joi.object({
-    name: Joi.string().min(3).required(),
-  });
-
-  const result = schema.validate(req.body);
-
-  if (result.error) {
-    res.status(400).send(result.error.details[0].message);
+  const { error } = validateCourse(req.body);
+  if (error) {
+    res.status(400).send(error.details[0].message);
     return;
   }
 
@@ -61,10 +56,9 @@ app.put('/api/courses/:id', (req, res) => {
     name: Joi.string().min(3).required(),
   });
 
-  const result = schema.validate(req.body);
-
-  if (result.error) {
-    res.status(400).send(result.error.details[0].message);
+  const { error } = validateCourse(req.body);
+  if (error) {
+    res.status(400).send(error.details[0].message);
     return;
   }
 
@@ -73,6 +67,14 @@ app.put('/api/courses/:id', (req, res) => {
   // Return updated course
   res.send(course);
 });
+
+const validateCourse = (course) => {
+  const schema = Joi.object({
+    name: Joi.string().min(3).required(),
+  });
+
+  return schema.validate(course);
+};
 
 // PORT
 const port = process.env.PORT || 3000;
